@@ -10,3 +10,6 @@ pycodestyle==2.6.0
 toml==0.10.2
 Werkzeug==1.0.1
 flask_login
+pymongo
+PyPDF2
+dnspython
