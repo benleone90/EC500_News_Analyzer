@@ -7,6 +7,8 @@ from docIngester.src import fileuploader as fu
 from werkzeug.utils import secure_filename
 import os
 import pathlib
+from .models import Document
+from . import db
 
 UPLOAD_FOLDER = './files'
 ALLOWED_EXTENSIONS = {'pdf'}
@@ -26,7 +28,12 @@ def index():
 @main.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html', name=current_user.name)
+    docs = []
+    rows = Document.query.filter_by(email=current_user.email)
+    for row in rows:
+        docs.append(row.name)
+    print(docs)
+    return render_template('profile.html', name=current_user.name, data=docs)
 
 @main.route('/upload')
 @login_required
@@ -49,11 +56,17 @@ def login_post():
         pathlib.Path(UPLOAD_FOLDER, current_user.email).mkdir(parents=True, exist_ok=True)
         path = os.path.join(UPLOAD_FOLDER, current_user.email, filename)
         file.save(path)
-        ret, msg = fu.create(current_user.email, path)
+        ret, msg, docName = fu.create(current_user.email, path)
         path = pathlib.Path(path)
         path.unlink()  # Delete file from local file store to save memory
         if ret is None:
             flash(msg)
             return redirect(request.url)
+
+        # add the new doc to the database
+        new_doc = Document(email=current_user.email, name=docName)
+        db.session.add(new_doc)
+        db.session.commit()
+
         flash('Upload Successful!')
         return redirect(request.url)

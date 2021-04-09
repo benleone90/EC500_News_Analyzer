@@ -7,4 +7,14 @@
 <h1 class="title">
   Welcome, {{ name }}!
 </h1>
+<div class="box">
+    <h2 class="content">
+        Your Documents
+    </h2>
+    {% for item in data %}
+        <div class="field">
+        {{ item|safe }}
+        </div >
+    {% endfor %}
+</div>
 {% endblock %}

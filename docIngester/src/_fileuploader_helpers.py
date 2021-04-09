@@ -39,7 +39,7 @@ def generateObject(path, userId):
     myobj["Upload_Date"] = str(datetime.now())  # Add upload date
     myobj["File_Metadata"] = _getMetadata(path)  # Extract and add metadata
     myobj["Text"]["Text"] = _generateText(path)  # Extract and add Text
-    return myobj
+    return myobj, myobj["Name"]
 
 
 def _getDocName(path):
