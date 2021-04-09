@@ -31,8 +31,8 @@ logging.basicConfig(filename='fileuploader.log', format='%(asctime)s %(levelname
 # @param<username> The username of the user creating an entry
 # @param<path> A path to a file to insert into the DB
 # Remove Test and fn params before production -- for unit tests only
-# @return If successful, returns the JSON version of the file and a success response code. Otherwise, returns the
-#         original parameters and an error code
+# @return If successful, returns the JSON version of the file and a success response code. Otherwise, returns None
+#         and an error code
 def create(username, path, test=False, fn=None):
 
     logging.info(f"{{Event: {ev.Event.CREATE_Initiated}, Target: {path, username}}}")
@@ -66,8 +66,8 @@ def create(username, path, test=False, fn=None):
 # Accessor for a single file in the DB
 # @param<username> A string containing the username of the user associated with the files
 # @param<fileobj> A (stringified) JSON object containing fields from which the file can be referenced (eg, Title or _id)
-# @return If the read is successful returns the file as a JSON object containing the file found along with a Success
-#         code. Otherwise, returns the original object, username, and an error code
+# @return If the read is successful returns the file as a JSON ob
+#          returns an empty JSON, and an error code
 def read_one(username, fileobj, test=False, fn=None):
 
     logging.info(f"{{Event: {ev.Event.READ_Initiated}, Target: {fileobj, username}}}")
@@ -77,10 +77,10 @@ def read_one(username, fileobj, test=False, fn=None):
         db_fileobj = json.loads(fileobj)
     except ValueError as E:
         logging.error(f"{{Event: {ev.Event.READ_Error}, Target: {fileobj, username}}}")
-        return username, fileobj, "Invalid object (Non-JSON) for File Read Request", 400
+        return None, "Invalid object (Non-JSON) for File Read Request", 400
     except TypeError as E:
         logging.error(f"{{Event: {ev.Event.READ_Error}, Target: {fileobj, username}}}")
-        return username, fileobj, "Invalid object (Non-JSON) for File Read Request", 400
+        return None, "Invalid object (Non-JSON) for File Read Request", 400
 
     # Calls non-DB test function for tests. Remove this block and test params (test=False, fn=None) before deployment
     # Test block begin
@@ -96,18 +96,18 @@ def read_one(username, fileobj, test=False, fn=None):
     # If database returns none, file is not in database
     if result is None or result == []:
         logging.error(f"{{Event: {ev.Event.READ_Error}, Target: {fileobj, username}}}")
-        return username, fileobj, "File Not Found", 404
+        return {}, "File Not Found", 404
     # Otherwise return result
     else:
         result = json.loads(result)
         logging.info(f"{{Event: {ev.Event.READ_Success}, Target: {fileobj, username}}}")
-        return result, 200
+        return result, "Success", 200
 
 
 # Accessor for all files in the DB belonging to a single user
 # @param<username> A string containing the username of the user associated with the files
 # @return If the read is successful returns the file as a JSON object containing the files found along with a Success
-#         code. Otherwise, returns the username and an error code
+#         code. Otherwise, returns an empty list and an error code
 def read_many(username, test=False, fn=None):
     logging.info(f"{{Event: {ev.Event.READ_Initiated}, Target: {username}}}")
 
@@ -126,12 +126,12 @@ def read_many(username, test=False, fn=None):
     # If database returns none, there are no files in the database belonging to this user
     if result is None or result == []:
         logging.error(f"{{Event: {ev.Event.READ_Error}, Target: {username}}}")
-        return username, "Files Not Found", 404
+        return [], "Files Not Found", 404
     # Otherwise return result
     else:
         result = json.loads(result)
         logging.info(f"{{Event: {ev.Event.READ_Success}, Target: {username}}}")
-        return result, 200
+        return result, "Success", 200
 
 
 # Modifies a file in the DB
