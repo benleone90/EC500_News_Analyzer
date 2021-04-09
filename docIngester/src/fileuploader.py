@@ -17,8 +17,8 @@ if __name__ == '__main__':
     from docDB import db
 
 else:
-    from docIngester.src import _fileuploader_events as ev
-    from docIngester.src import _fileuploader_helpers as funcs
+    from . import _fileuploader_events as ev
+    from . import _fileuploader_helpers as funcs
     from docDB import db
 
 # Init logger
@@ -41,7 +41,7 @@ def create(username, path, test=False, fn=None):
 
     if fileObj is None:
         logging.error(f"{{Event: {ev.Event.CREATE_Error}, Target: {path, username}}}")
-        return username, path, "File could not be converted", 400
+        return None, "File could not be converted"
 
     # Calls non-DB test function for tests. Remove this block and test params (test=False, fn=None) before deployment
     # Test block begin
@@ -56,10 +56,11 @@ def create(username, path, test=False, fn=None):
 
     if result:
         logging.info(f"{{Event: {ev.Event.CREATE_Success}, Target: {path, username}}}")
-        return fileObj, 200
+        return fileObj, "Document Successfully Uploaded"
     else:
         logging.error(f"{{Event: {ev.Event.CREATE_Error}, Target: {path, username}}}")
-        return username, path, "This Document already exists!", 400
+        return None, "This Document could not be added to the database. Please make sure that you have not already " \
+                     "added this document "
 
 
 # Accessor for a single file in the DB

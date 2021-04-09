@@ -19,7 +19,7 @@ if __name__ == '__main__':
 else:
     from . import _fileuploader_events as ev
     from . import _fileuploader_helpers as funcs
-    from src.docDB import db
+    from app.src.docDB import db
 
 # Init logger
 logger = logging.getLogger(__name__)  # set module level logger
