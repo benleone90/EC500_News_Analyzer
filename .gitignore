@@ -131,4 +131,5 @@ dmypy.json
 # SQL DB
 *.sqlite
 
-
+# PyCharm files
+.idea
