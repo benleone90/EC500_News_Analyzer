@@ -40,3 +40,6 @@ typing-inspect==0.6.0
 urllib3==1.26.4
 Werkzeug==1.0.1
 zipp==3.4.1
+pynytimes
+PyPDF2
+pymongo
