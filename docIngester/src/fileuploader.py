@@ -92,7 +92,6 @@ def read_one(username, fileobj, test=False, fn=None):
 
     # Un-comment out below line for production
     # result = db.getDocument(username, db_fileobj)  # Extract requested document from database
-
     # If database returns none, file is not in database
     if result is None or result == []:
         logging.error(f"{{Event: {ev.Event.READ_Error}, Target: {fileobj, username}}}")

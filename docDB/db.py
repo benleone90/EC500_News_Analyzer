@@ -61,7 +61,7 @@ def getDocument(username, docobj):
     ids = _validateDocObj(docobj)  # Validate that this json object has the correct identifiers for a query
 
     # If no valid identifiers or username is passed, return None
-    if not ids is None:
+    if not ids:
         return None
 
     # Add valid identifiers to query
