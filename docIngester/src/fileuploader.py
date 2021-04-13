@@ -31,8 +31,8 @@ logging.basicConfig(filename='fileuploader.log', format='%(asctime)s %(levelname
 # @param<username> The username of the user creating an entry
 # @param<path> A path to a file to insert into the DB
 # Remove Test and fn params before production -- for unit tests only
-# @return If successful, returns the JSON version of the file and a success response code. Otherwise, returns None
-#         and an error code
+# @return If successful, returns the JSON version of the file and a success response code. Otherwise, returns an empty
+#         JSON and an error message
 def create(username, path, test=False, fn=None):
 
     logging.info(f"{{Event: {ev.Event.CREATE_Initiated}, Target: {path, username}}}")
@@ -41,7 +41,7 @@ def create(username, path, test=False, fn=None):
 
     if fileObj is None:
         logging.error(f"{{Event: {ev.Event.CREATE_Error}, Target: {path, username}}}")
-        return None, "File could not be converted"
+        return {}, "File could not be converted"
 
     # Calls non-DB test function for tests. Remove this block and test params (test=False, fn=None) before deployment
     # Test block begin
@@ -56,18 +56,18 @@ def create(username, path, test=False, fn=None):
 
     if result:
         logging.info(f"{{Event: {ev.Event.CREATE_Success}, Target: {path, username}}}")
-        return fileObj, "Document Successfully Uploaded", name
+        return fileObj, "Document Successfully Uploaded"
     else:
         logging.error(f"{{Event: {ev.Event.CREATE_Error}, Target: {path, username}}}")
-        return None, "This Document could not be added to the database. Please make sure that you have not already " \
-                     "added this document ", name
+        return {}, "This Document could not be added to the database. Please make sure that you have not already " \
+                     "added this document "
 
 
 # Accessor for a single file in the DB
 # @param<username> A string containing the username of the user associated with the files
 # @param<fileobj> A (stringified) JSON object containing fields from which the file can be referenced (eg, Title or _id)
-# @return If the read is successful returns the file as a JSON ob
-#          returns an empty JSON, and an error code
+# @return If the read is successful returns the file as a JSON object and a success message. Otherwise, returns an empty
+#        JSON, and an error code
 def read_one(username, fileobj, test=False, fn=None):
 
     logging.info(f"{{Event: {ev.Event.READ_Initiated}, Target: {fileobj, username}}}")
@@ -77,10 +77,10 @@ def read_one(username, fileobj, test=False, fn=None):
         db_fileobj = json.loads(fileobj)
     except ValueError as E:
         logging.error(f"{{Event: {ev.Event.READ_Error}, Target: {fileobj, username}}}")
-        return None, "Invalid object (Non-JSON) for File Read Request", 400
+        return {}, "Invalid object (Non-JSON) for File Read Request"
     except TypeError as E:
         logging.error(f"{{Event: {ev.Event.READ_Error}, Target: {fileobj, username}}}")
-        return None, "Invalid object (Non-JSON) for File Read Request", 400
+        return {}, "Invalid object (Non-JSON) for File Read Request"
 
     # Calls non-DB test function for tests. Remove this block and test params (test=False, fn=None) before deployment
     # Test block begin
@@ -96,12 +96,12 @@ def read_one(username, fileobj, test=False, fn=None):
     # If database returns none, file is not in database
     if result is None or result == []:
         logging.error(f"{{Event: {ev.Event.READ_Error}, Target: {fileobj, username}}}")
-        return {}, "File Not Found", 404
+        return {}, "File Not Found"
     # Otherwise return result
     else:
         result = json.loads(result)
         logging.info(f"{{Event: {ev.Event.READ_Success}, Target: {fileobj, username}}}")
-        return result, "Success", 200
+        return result, "Success"
 
 
 # Accessor for all files in the DB belonging to a single user
@@ -126,12 +126,12 @@ def read_many(username, test=False, fn=None):
     # If database returns none, there are no files in the database belonging to this user
     if result is None or result == []:
         logging.error(f"{{Event: {ev.Event.READ_Error}, Target: {username}}}")
-        return [], "Files Not Found", 404
+        return [], "Files Not Found"
     # Otherwise return result
     else:
         result = json.loads(result)
         logging.info(f"{{Event: {ev.Event.READ_Success}, Target: {username}}}")
-        return result, "Success", 200
+        return result, "Success"
 
 
 # Modifies a file in the DB
@@ -139,7 +139,7 @@ def read_many(username, test=False, fn=None):
 # @param<identifier> A JSON object containing fields from which the file can be referenced (eg, Title or _id)
 # @param<update> A JSON string object containing the specific parameters to update
 # @return If the update is successful returns updated file as a JSON object along with a Success code
-#         Otherwise, otherwise returns the original parameters and an error code
+#         Otherwise, otherwise returns an empty JSON and an error code
 def update(username, identifier, updateObj, test=False, fn=None):
     logging.info(f"{{Event: {ev.Event.UPDATE_Initiated}, Target: {username, identifier, updateObj}}}")
 
@@ -149,10 +149,10 @@ def update(username, identifier, updateObj, test=False, fn=None):
         db_update = json.loads(updateObj)
     except ValueError as E:
         logging.error(f"{{Event: {ev.Event.READ_Error}, Target: {username, identifier, updateObj}}}")
-        return username, identifier, updateObj, "Invalid Request parameters", 400
+        return {}, "Invalid Request parameters"
     except TypeError as E:
         logging.error(f"{{Event: {ev.Event.READ_Error}, Target: {username, identifier, updateObj}}}")
-        return username, identifier, updateObj, "Invalid Request parameters", 400
+        return {}, "Invalid Request parameters"
 
     # Calls non-DB test function for tests. Remove this block and test params (test=False, fn=None) before deployment
     # Test block begin
@@ -169,19 +169,19 @@ def update(username, identifier, updateObj, test=False, fn=None):
     # A none result means that the file could not be updated, return an error
     if result is None or result == []:
         logging.error(f"{{Event: {ev.Event.READ_Error}, Target: {identifier, updateObj}}}")
-        return username, identifier, updateObj, "Could not complete your update", 400
+        return {}, "Could not complete your update"
     # Otherwise, return the updated files
     else:
         result = json.loads(result)
         logging.info(f"{{Event: {ev.Event.UPDATE_Success}, Target: {identifier, updateObj}}}")
-        return "Update Successful", result, 200
+        return result, "Update Successful"
 
 
 # Delete a file in the DB
 # @param<username> A string containing the username of the user associated with the files
 # @param<fileObj> A JSON object containing a unique identifier (eg file name or _id) associated with the file to delete.
 # @return If the delete is successful, returns a success message and the number of files deleted.
-#         Otherwise, returns the original object and an error code
+#         Otherwise, an error message and an error code
 def delete(username, fileObj, test=False, fn=None):
     logging.info(f"{{Event: {ev.Event.DELETE_Initiated}, Target: {username, fileObj}}}")
 
@@ -190,10 +190,10 @@ def delete(username, fileObj, test=False, fn=None):
         db_fileObj = json.loads(fileObj)
     except ValueError as E:
         logging.error(f"{{Event: {ev.Event.DELETE_Error}, Target: {username, fileObj}}}")
-        return username, fileObj, "Invalid request Parameters", 400
+        return "Invalid request Parameters", 400
     except TypeError as E:
         logging.error(f"{{Event: {ev.Event.DELETE_Error}, Target: {username, fileObj}}}")
-        return username, fileObj, "Invalid request Parameters", 400
+        return "Invalid request Parameters", 400
 
     # Calls non-DB test function for tests. Remove this block and test params (test=False, fn=None) before deployment
     # Test block begin
@@ -208,7 +208,7 @@ def delete(username, fileObj, test=False, fn=None):
     # result = db.deleteDocument(username, db_fileObj)     # Attempt to delete from DB
     if result is None or result <= 0:
         logging.error(f"{{Event: {ev.Event.DELETE_Error}, Target: {username, fileObj}}}")
-        return username, fileObj, "Unable to delete file", 404
+        return "Unable to delete file", 404
 
     # Log success and return number of documents deleted
     logging.info(f"{{Event: {ev.Event.DELETE_Success}, Target: {username, fileObj}}}")
