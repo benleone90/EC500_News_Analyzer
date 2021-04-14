@@ -27,7 +27,7 @@ def index():
 @login_required
 def profile():
     docs = []
-    elements, msg, code = fu.read_many(current_user.email)
+    elements, code = fu.read_many(current_user.email)
     for element in elements:
         docs.append(element.get("Name"))
     return render_template('profile.html', name=current_user.name, data=docs)
@@ -53,10 +53,10 @@ def login_post():
         pathlib.Path(UPLOAD_FOLDER, current_user.email).mkdir(parents=True, exist_ok=True)
         path = os.path.join(UPLOAD_FOLDER, current_user.email, filename)
         file.save(path)
-        ret, msg, docName = fu.create(current_user.email, path)
+        ret, msg = fu.create(current_user.email, path)
         path = pathlib.Path(path)
         path.unlink()  # Delete file from local file store to save memory
-        if ret is None:
+        if ret == {}:
             flash(msg)
             return redirect(request.url)
         flash('Upload Successful!')
