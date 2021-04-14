@@ -27,7 +27,7 @@ def index():
 @login_required
 def profile():
     docs = []
-    elements, msg, code = fu.read_many(current_user.email)
+    elements, code = fu.read_many(current_user.email)
     for element in elements:
         docs.append(element.get("Name"))
     return render_template('profile.html', name=current_user.name, data=docs)
