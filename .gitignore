@@ -134,6 +134,7 @@ dmypy.json
 # PyCharm files
 .idea
 
+<<<<<<< HEAD
 
 #Mac Files
 .DS_Store
@@ -141,4 +142,5 @@ dmypy.json
 
 #Local test files
 test.py
+
 
