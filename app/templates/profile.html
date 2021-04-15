@@ -2,11 +2,13 @@
 <!-- source: https://www.digitalocean.com/community/tutorials/how-to-add-authentication-to-your-app-with-flask-login -->
 
 {% extends "base.html" %} {% block content %}
-<h1 class="title">Welcome, {{ name }}!</h1>
-<div class="box">
-  <div class="content is-large">Your Documents</div>
-  {% for item in data %}
-  <div class="field">{{ item|safe }}</div>
-  {% endfor %}
+<div class="container text-center">
+  <h1 class="display-2">Welcome, {{ name }}!</h1>
+  <div class="box">
+    <h1 class="display-5">Your Documents</h1>
+    {% for item in data %}
+    <div class="field">{{ item|safe }}</div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}
