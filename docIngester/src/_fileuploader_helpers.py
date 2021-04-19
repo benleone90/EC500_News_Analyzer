@@ -7,7 +7,6 @@ import fitz
 from datetime import datetime
 import os
 
-
 # Generate a default file object with empty fields
 def _getDefaultFileObj():
     fileobj = {

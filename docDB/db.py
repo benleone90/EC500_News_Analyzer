@@ -35,11 +35,13 @@ def _getDocCollection():
 def addDocument(document_input):
     documents = _getDocCollection()
 
-    UID = document_input["UID"] # Ensure we have a valid user in the DB to associate with this document
+    # Ensure we have a valid user in the DB to associate with this document
+    UID = document_input["UID"]
     if UID is None:
         return None
 
-    document = copy.copy(document_input)  # Create a copy so don't update fields of original document
+    # Create a copy so don't update fields of original document
+    document = copy.copy(document_input)
 
     # Query to determine if this document already exists in the DB
     query = {"Name": document["Name"], "UID": UID, "Deleted": "False"}
@@ -58,7 +60,8 @@ def addDocument(document_input):
 # @param<docobj>   A JSON object containing a valid identifier (id or Name) associated with the document
 # @return          The document (as a JSON) if one is found and None otherwise
 def getDocument(username, docobj):
-    ids = _validateDocObj(docobj)  # Validate that this json object has the correct identifiers for a query
+    # Validate that this json object has the correct identifiers for a query
+    ids = _validateDocObj(docobj)
 
     # If no valid identifiers or username is passed, return None
     if not ids is None:
@@ -91,7 +94,8 @@ def getDocuments(uid):
 
     query = {"UID": uid, "Deleted": "False"}  # Set query parameters
 
-    if documents.count_documents(query) == 0:  # Ensure there are documents in the DB
+    # Ensure there are documents in the DB
+    if documents.count_documents(query) == 0:
         return None
 
     doc = documents.find(query)  # find document(s)
@@ -105,7 +109,8 @@ def getDocuments(uid):
 # @param<update> A JSON object containing the update to apply to the document
 # @return        The updated document (as a JSON) or None if the query is invalid
 def updateDocument(username, idObj, update):
-    ids = _validateDocObj(idObj)  # Validate that this json object has the correct identifiers for a query
+    # Validate that this json object has the correct identifiers for a query
+    ids = _validateDocObj(idObj)
 
     # If no valid identifiers are passed, return None
     if not ids:
@@ -114,7 +119,7 @@ def updateDocument(username, idObj, update):
     # Add valid identifiers to query
     query = dict()
     query["Deleted"] = "False"  # Ensure we do not fetch deleted documents
-    query["UID"] = username # Add UID for user
+    query["UID"] = username  # Add UID for user
     for identifier in ids:
         query[identifier] = idObj[identifier]
 
@@ -123,7 +128,8 @@ def updateDocument(username, idObj, update):
     result = documents.update_one(query, newvalues)  # Update document
 
     if result.modified_count > 0:  # If we have successfully updated the document, return the document by calling get
-        objcopy = copy.copy(idObj)  # Create a shallow copy to avoid mutating original object
+        # Create a shallow copy to avoid mutating original object
+        objcopy = copy.copy(idObj)
         if "Name" in update:
             objcopy["Name"] = update["Name"]
         obj = getDocument(username, objcopy)
@@ -135,7 +141,8 @@ def updateDocument(username, idObj, update):
 # @param<idObj>  A JSON object containing a valid identifier (id or Name) associated with the document
 # @return        The number of documents marked as deleted
 def deleteDocument(username, idObj):
-    ids = _validateDocObj(idObj)  # Validate that this json object has the correct identifiers for a query
+    # Validate that this json object has the correct identifiers for a query
+    ids = _validateDocObj(idObj)
 
     # If no valid identifiers are passed, return None
     if not ids:
@@ -148,10 +155,12 @@ def deleteDocument(username, idObj):
     for identifier in ids:
         query[identifier] = idObj[identifier]
 
-    newvalues = {"$set": {"Deleted": "True"}}  # Set deleted flag on "deleted" document
+    # Set deleted flag on "deleted" document
+    newvalues = {"$set": {"Deleted": "True"}}
 
     documents = _getDocCollection()
-    result = documents.update_one(query, newvalues)  # Update document with deleted flag
+    # Update document with deleted flag
+    result = documents.update_one(query, newvalues)
     return result.modified_count  # Return # docs updated with deleted flag
 
 
@@ -162,7 +171,8 @@ def deleteAllUserDocs(username):
     documents = _getDocCollection()
 
     query = {"UID": username, "Deleted": "False"}
-    deletedflag = {"$set": {"Deleted": "True"}}  # Set deleted flag on "deleted" document
+    # Set deleted flag on "deleted" document
+    deletedflag = {"$set": {"Deleted": "True"}}
     result = documents.update_many(query, deletedflag)
     return result.modified_count
 

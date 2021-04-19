@@ -13,15 +13,20 @@ ALLOWED_EXTENSIONS = {'pdf'}
 
 # Ensure a file is an allowed file type (for now, just PDF)
 # Source: https://flask.palletsprojects.com/en/1.1.x/patterns/fileuploads/
+
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
 main = Blueprint('main', __name__)
+
 
 @main.route('/')
 def index():
     return render_template('index.html')
+
 
 @main.route('/profile')
 @login_required
@@ -32,10 +37,12 @@ def profile():
         docs.append(element.get("Name"))
     return render_template('profile.html', name=current_user.name, data=docs)
 
+
 @main.route('/upload')
 @login_required
 def upload():
     return render_template('upload.html')
+
 
 @main.route('/upload', methods=['POST'])
 @login_required
@@ -50,7 +57,8 @@ def login_post():
         return redirect(request.url)
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        pathlib.Path(UPLOAD_FOLDER, current_user.email).mkdir(parents=True, exist_ok=True)
+        pathlib.Path(UPLOAD_FOLDER, current_user.email).mkdir(
+            parents=True, exist_ok=True)
         path = os.path.join(UPLOAD_FOLDER, current_user.email, filename)
         file.save(path)
         ret, msg = fu.create(current_user.email, path)
