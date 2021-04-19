@@ -3,7 +3,7 @@ from memory_profiler import profile
 import tracemalloc
 import cProfile
 import re
-from nlp_analyzer import nlpanalyzer as np
+from nlp import nlpanalyzer as np
 
 
 # ==================

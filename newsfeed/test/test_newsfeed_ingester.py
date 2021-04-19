@@ -3,7 +3,7 @@ from memory_profiler import profile
 
 import tracemalloc
 import cProfile
-from newsfeed_ingester import newsfeedingester as ni
+from newsfeed import newsfeedingester as ni
 
 
 # ==================
