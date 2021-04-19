@@ -2,7 +2,8 @@
 # Private Helper Functions for File Uploader API
 # ======================================================
 
-from PyPDF2 import PdfFileReader
+# from PyPDF2 import PdfFileReader
+import fitz
 from datetime import datetime
 import os
 
@@ -29,7 +30,7 @@ def _getDefaultFileObj():
 def generateObject(path, userId):
 
     if not os.access(path, os.R_OK) and not os.path.exists(path):  # Check if file exists before processing
-        return None
+        return None, None
 
     myobj = _getDefaultFileObj()
     myobj["Name"] = _getDocName(path)  # Extract name from path
@@ -52,36 +53,31 @@ def _getMetadata(path):
         "Author": "",
         "Creator": ""
     }
-    f = open(path, "rb")
-    pdf_file_obj = PdfFileReader(f)
-    doc_info = pdf_file_obj.getDocumentInfo()
-    metadata["Title"] = doc_info.title
-    metadata["Author"] = doc_info.author
-    metadata["Creator"] = doc_info.creator
+    doc = fitz.open(path)
+    doc_info = doc.metadata
+    metadata["Title"] = doc_info.get('title')
+    metadata["Author"] = doc_info.get('author')
+    metadata["Creator"] = doc_info.get('creator')
     return metadata
 
 
-# Extracts text from a PDF file
+# Extracts text from a PDF file into paragraphs
 def _generateText(path):
-    text = []
-    with open(path, "rb") as f:
-        pdf_file_obj = PdfFileReader(f)
-        numpages = pdf_file_obj.numPages
-        for i in range(0, numpages):
-            page = pdf_file_obj.getPage(i)
-            textstring = page.extractText()  # Extract all text from a single page
-            textstring = textstring.strip().split('\n\n') # Split into paragraphs as possible
-            if len(textstring) == 1:
-                textstring = textstring[0].split('\n') # Further process if needed
-            for j in range(len(textstring)):  # Append each paragraph to text list
-                if textstring[j].isspace():  # Exclude empty lines
-                    pass
-                textstring[j] = textstring[j].replace('\n', ' ')  # Remove excess newlines that may have been generated
-                text.append(textstring[j])
+    textArray = []
+    doc = fitz.open(path)
+    for page in doc:
+        pagetext = page.get_text("blocks")
+        for texts in pagetext:
+            if len(texts) >= 4:
+                text = texts[4]
+                text = text.strip('\n')
+                text = text.strip()
+                text = text.replace('\n', '')
+                if text and "<image:" not in text:
+                    textArray.append(text)
 
-    return text
+    return textArray
 
 
 if __name__ == '__main__':
-    print(generateObject('./test/test.pdf', "Wiley"))
-    print(generateObject('./test/test333.pdf', "Wiley"))
+    data = generateObject("./test/test.pdf", "journalist")

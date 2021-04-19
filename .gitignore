@@ -133,4 +133,7 @@ dmypy.json
 
 # IDE files
 .idea
+
+#Mac Files
+.DS_Store
 .vscode
