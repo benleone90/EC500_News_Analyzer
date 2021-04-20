@@ -4,6 +4,9 @@
 {% extends "base.html" %} {% block content %}
 <div class="conatiner mx-auto" style="width: 500px">
   <h1 class="display-5 text-center">Login</h1>
+  {% with messages = get_flashed_messages() %} {% if messages %}
+  <div class="alert alert-danger" role="alert">{{ messages[0] }}</div>
+  {% endif %} {% endwith %}
   <form action="/login" method="POST">
     <div class="mb-3">
       <input
@@ -27,10 +30,5 @@
     </div>
     <button type="submit" class="btn btn-dark">Submit</button>
   </form>
-  {% with messages = get_flashed_messages() %} {% if messages %}
-  <div class="alert alert-danger" role="alert">
-    {{ messages[0] }}
-  </div>
-  {% endif %} {% endwith %}
 </div>
 {% endblock %}
