@@ -69,3 +69,10 @@ def login_post():
             return redirect(request.url)
         flash('Upload Successful!')
         return redirect(request.url)
+
+
+@main.route('/report/<string:document>')
+@login_required
+def generate_report(document):
+    print(document)
+    return redirect(url_for('index.html'))
