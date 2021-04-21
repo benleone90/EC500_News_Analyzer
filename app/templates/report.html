@@ -3,10 +3,13 @@
   <h1 class="display-2">Report for {{ docname }}</h1>
   <p class="box">
     <h1 class="display-5">Document Content Categories</h1>
-    {% for item in content %}
-    <div class="field">{{ item|safe }}</div>
-    {% endfor %}
+    <div class="row">
+      {% for item in content %}
+      <div class="col-lg-4">{{ item|safe }}</div>
+      {% endfor %}
+    </div>
       <h1 class="display-5">Sentiment Analysis</h1>
+
         <h2 class="display-7">Overall Sentiment Score: {{nlpScore}}</h2>
         <h2 class="display-7">Most Positive Paragraph Score: {{mpScore}}</h2>
         <h2 class="display-7"> Most Positive Paragraph Text</h2>
@@ -21,7 +24,7 @@
               <h4 class="display-9">Links to News Articles for {{ item[0]|safe }}</h4>
                 {% for mylink in links.get(item[0]) %}
                   <div class="field"> Summary: {{ mylink.get("Summary") |safe }}</div>
-                  <a href> {{ mylink.get("URL") |safe }}</a>
+                  <a href={{mylink.get("URL")}}> {{ mylink.get("URL") |safe }}</a>
                 {% endfor %}
           {% endfor %}
       <h1 class="display-5">Full Text Breakdown</h1>
