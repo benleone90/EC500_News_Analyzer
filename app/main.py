@@ -3,6 +3,7 @@
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
+# from flask_weasyprint import HTML, render_pdf
 from docIngester.src import fileuploader as fu
 from reportGenerator import generator as gen
 from werkzeug.utils import secure_filename
@@ -100,3 +101,10 @@ def generate_report(document):
     return render_template('report.html', docname=document, content=contentClass, nlpScore=score, mpScore=mpScore,
                            mpText=mpText, mnScore=mnScore, mnText=mnText, entities=entities, links=links,
                            pars=paragraphBreakdown)
+
+    # html= render_template('report.html', docname=document, content=contentClass, nlpScore=score, mpScore=mpScore,
+    #                        mpText=mpText, mnScore=mnScore, mnText=mnText, entities=entities, links=links,
+    #                        pars=paragraphBreakdown)
+
+    # return render_pdf(html=HTML(string=html), stylesheets="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css")
+    # return render_pdf(html=HTML(string=html))
