@@ -1,6 +1,7 @@
 {% extends "base.html" %} {% block content %}
 <p class="container text-center">
 <button onclick="window.print()">Print Report</button>
+<div id = "content">
   <h1 class="display-2">Report for {{ docname }}</h1>
     <div class="card">
     <div class="card-header">Document Content Categories</div>
@@ -48,4 +49,20 @@
       {% endfor %}
 
 </div>
+    </div>
+<button id="cmd">generate PDF</button>
+<body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
+<script type="text/javascript">
+var doc = new jsPDF('p', 'pt', 'letter');
+$('#cmd').click(function() {
+   doc.fromHTML($('#content')[0], 15, 15, {
+      width: 170
+   }, function() {
+      doc.save('sample-file.pdf');
+   });
+});
+</script>
+</body>
 {% endblock %}
