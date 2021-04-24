@@ -1,0 +1,22 @@
+
+{% extends "base.html" %} {% block content %}
+  <h1 class="display-5">{{docName}}</h1>
+    <div class="card">
+    <div class="card-header">Document Metadata</div>
+    <div class="card-body">
+      {% for item in metadata %}
+      <div class="card-text">{{ item[0]|safe }}: {{ item[1]|safe }}</div>
+      {% endfor %}
+    </div>
+    </div>
+    <div class="card">
+    <div class="card-header">Document Text</div>
+    <div class="card-body">
+      {% for item in text %}
+      <div class="card-text">{{ item|safe }}</div>
+      <br>
+      {% endfor %}
+    </div>
+    </div>
+
+{% endblock %}

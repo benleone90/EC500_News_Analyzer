@@ -8,6 +8,7 @@ from reportGenerator import generator as gen
 from werkzeug.utils import secure_filename
 import os
 import pathlib
+import json
 
 UPLOAD_FOLDER = './files'
 ALLOWED_EXTENSIONS = {'pdf'}
@@ -100,3 +101,17 @@ def generate_report(document):
     return render_template('report.html', docname=document, content=contentClass, nlpScore=score, mpScore=mpScore,
                            mpText=mpText, mnScore=mnScore, mnText=mnText, entities=entities, links=links,
                            pars=paragraphBreakdown)
+
+@main.route('/view/<string:document>')
+@login_required
+def view_document(document):
+    document_json = json.dumps({"Name": document})
+    doc, code = fu.read_one(current_user.email, document_json)  # Retrieves document from the DB
+    if doc is None or doc == {}:
+        flash('An Error Occurred in retrieving this document')
+        return redirect(url_for('main.profile'))
+
+    text = doc.get('Text').get('Text')  # Extract All paragraphs from text
+    metadata = doc.get("File_Metadata").items()
+
+    return render_template('docView.html', docname=document, text=text, metadata=metadata)
