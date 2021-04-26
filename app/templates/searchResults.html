@@ -4,11 +4,12 @@
   {% endif %} {% endwith %}
   <h2 class="display-4 text-center">Search Results in all documents for keywords: {{ keywords }}</h2>
     {% for item in results %}
-    <div class="card">
-      <div class="card-header">Document: {{item.get("Title")}}</div>
+    <div class="card mb-3">
+      <div class="card-header fw-bold">Document: {{item.get("Title")}}</div>
         {% for par in item.get("Paragraphs") %}
-            <div class="card-body">Paragraph: {{ par[0]|safe }} </div>
+            <div class="card-body fw-bold">Paragraph: {{ par[0]|safe }} </div>
             <div class="card-body">{{ par[1]|safe }} </div>
+            <hr \>
         {% endfor %}
     </div>
     {% endfor %}
