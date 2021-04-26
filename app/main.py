@@ -83,17 +83,18 @@ def generate_report(document):
         flash('An Error Occurred')
         return redirect(url_for('main.profile'))
 
-    score = doc_info["OVERALL_SENTIMENT"] # A Float
-    mpScore = doc_info["MOST_POSITIVE_PAR"][0] # A Float
-    mpText = doc_info["MOST_POSITIVE_PAR"][1] # A Paragraph of text
-    mnScore = doc_info["LEAST_POSITIVE_PAR"][0] # A float
-    mnText = doc_info["LEAST_POSITIVE_PAR"][1] # A paragraph of text
-    entities = doc_info["ENT_LIST"] # A List of pairs
-    links = doc_info["NEWS_LINKS"] # A List of pairs
-    paragraphBreakdown = doc_info["PARAGRAPH_BREAKDOWN"] # A List of dictionaries
+    score = doc_info["OVERALL_SENTIMENT"]  # A Float
+    mpScore = doc_info["MOST_POSITIVE_PAR"][0]  # A Float
+    mpText = doc_info["MOST_POSITIVE_PAR"][1]  # A Paragraph of text
+    mnScore = doc_info["LEAST_POSITIVE_PAR"][0]  # A float
+    mnText = doc_info["LEAST_POSITIVE_PAR"][1]  # A paragraph of text
+    entities = doc_info["ENT_LIST"]  # A List of pairs
+    links = doc_info["NEWS_LINKS"]  # A List of pairs
+    # A List of dictionaries
+    paragraphBreakdown = doc_info["PARAGRAPH_BREAKDOWN"]
 
-
-    contentClass = [x.get("Category").strip('/') for x in doc_info["CONTENT_CLASS"] if x.get("Category") is not None]
+    contentClass = [x.get("Category").strip(
+        '/') for x in doc_info["CONTENT_CLASS"] if x.get("Category") is not None]
 
     if not contentClass:
         contentClass = ["No Categories Identified"]
@@ -102,11 +103,13 @@ def generate_report(document):
                            mpText=mpText, mnScore=mnScore, mnText=mnText, entities=entities, links=links,
                            pars=paragraphBreakdown)
 
+
 @main.route('/view/<string:document>')
 @login_required
 def view_document(document):
     document_json = json.dumps({"Name": document})
-    doc, code = fu.read_one(current_user.email, document_json)  # Retrieves document from the DB
+    # Retrieves document from the DB
+    doc, code = fu.read_one(current_user.email, document_json)
     if doc is None or doc == {}:
         flash('An Error Occurred in retrieving this document')
         return redirect(url_for('main.profile'))
