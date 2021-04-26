@@ -49,6 +49,8 @@ def keySearch():
         return redirect(url_for('main.profile'))
     keywords = keywords.split(',')  # Split keywords by comma separator
     results = search.runSearch(current_user.email, keywords)  # Retrieve results from entity analysis
+    if results is None or results == []:
+        results = [{"Title": "No Results Found", "Paragraphs": []}]
     keystring = ', '.join([str(kword) for kword in keywords])  # Generate keyword string for display
     return render_template('searchResults.html', keywords=keystring, results=results)
 
