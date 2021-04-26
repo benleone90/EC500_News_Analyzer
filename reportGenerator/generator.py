@@ -27,10 +27,11 @@ def generateReport(uname, document):
     ret = dict()  # Dictionary to return
     document_json = json.dumps({"Name": document})
     doc, code = fu.read_one(uname, document_json)  # Retrieves document from the DB
-    if doc is None:
+    if doc is None or doc == {}:
         return None
 
     text = doc.get('Text').get('Text')  # Extract All paragraphs from text
+
     fulltext = ' '.join(str(x) for x in text)  # Full document text
 
     _getParagraphNLPResults(textArray=text, ret=ret)  # Extracts NLP results by paragraph and adds to ret

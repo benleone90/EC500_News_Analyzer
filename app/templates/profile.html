@@ -1,13 +1,16 @@
 <!-- templates/profile.html -->
-<!-- source: https://www.digitalocean.com/community/tutorials/how-to-add-authentication-to-your-app-with-flask-login -->
 
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} {% block content %} {% with messages =
+get_flashed_messages() %} {% if messages %}
+<div class="alert alert-danger" role="alert">{{ messages[0] }}</div>
+{% endif %} {% endwith %}
 <div class="container mx-auto" style="width: 500px">
   <h1 class="display-2 text-center">Welcome, {{ name }}!</h1>
   <h1 class="display-5 text-center">Your Documents</h1>
   {% for item in data %}
   <div class="card mb-3">
     <div class="card-body text-start">{{ item|safe }}</div>
+    <a class="btn btn-primary" href="/view/{{ item }}">View Document</a>
     <a class="btn btn-secondary" href="/report/{{ item }}">Generate Report</a>
   </div>
   {% endfor %}

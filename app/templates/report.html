@@ -1,0 +1,63 @@
+{% extends "base.html" %} {% block content %}
+<p class="container text-center">
+  <button onclick="window.print()">Print this page</button>
+</p>
+
+<h1 class="display-2">Report for {{ docname }}</h1>
+<div class="card mb-3">
+  <div class="card-header fw-bold">Document Content Categories</div>
+  <div class="card-body">
+    {% for item in content %}
+    <div class="card-text">{{ item|safe }}</div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header fw-bold">Sentiment Analysis</div>
+  <div class="card-body">Overall Sentiment Score: {{nlpScore}}</div>
+  <div class="card-header">Most Positive Paragraph</div>
+  <div class="card-body">Most Positive Paragraph Score: {{mpScore}}</div>
+  <div class="card-body">
+    Most Positive Paragraph Text
+    <div class="card-text">{{mpText}}</div>
+  </div>
+  <div class="card-header">Most Negative Paragraph</div>
+  <div class="card-body">Most Negative Paragraph Score: {{mnScore}}</div>
+  <div class="card-body">
+    Most Negative Paragraph Text
+    <div class="card-text">{{mnText}}</div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header fw-bold">Top 5 Entities Extracted</div>
+  {% for item in entities %}
+  <div class="card-body">
+    {{ item[0]|safe }} is mentioned in {{ item[1]|safe }} paragraphs
+  </div>
+  <div class="card-body">
+    Links to News Articles for {{ item[0]|safe }} {% for mylink in
+    links.get(item[0]) %}
+    <div class="card-text">Summary: {{ mylink.get("Summary") |safe }}</div>
+    <a href="{{mylink.get(URL)}}"> {{ mylink.get("URL") |safe }}</a>
+    {% endfor %}
+  </div>
+  <hr />
+  {% endfor %}
+</div>
+
+<div class="card mb-3">
+  <div class="card-header fw-bold">Full Text Breakdown</div>
+  {% for item in pars %}
+  <div class="card-body">Paragraph Number: {{item.get("NUM")}}</div>
+  <div class="card-body">Sentiment Score: {{item.get("SCORE")}}</div>
+  <div class="card-body">
+    Full Text
+    <div class="card-text">{{item.get("TEXT")}}</div>
+  </div>
+  <hr />
+  {% endfor %}
+</div>
+
+{% endblock %}

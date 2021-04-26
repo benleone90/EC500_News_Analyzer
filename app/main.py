@@ -4,9 +4,11 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from docIngester.src import fileuploader as fu
+from reportGenerator import generator as gen
 from werkzeug.utils import secure_filename
 import os
 import pathlib
+import json
 
 UPLOAD_FOLDER = './files'
 ALLOWED_EXTENSIONS = {'pdf'}
@@ -74,5 +76,45 @@ def login_post():
 @main.route('/report/<string:document>')
 @login_required
 def generate_report(document):
-    print(document)
-    return redirect(url_for('index.html'))
+    doc_info = gen.generateReport(current_user.email, document)
+
+    # If nothing in the DB, return to profiule
+    if doc_info is None or doc_info == {}:
+        flash('An Error Occurred')
+        return redirect(url_for('main.profile'))
+
+    score = doc_info["OVERALL_SENTIMENT"]  # A Float
+    mpScore = doc_info["MOST_POSITIVE_PAR"][0]  # A Float
+    mpText = doc_info["MOST_POSITIVE_PAR"][1]  # A Paragraph of text
+    mnScore = doc_info["LEAST_POSITIVE_PAR"][0]  # A float
+    mnText = doc_info["LEAST_POSITIVE_PAR"][1]  # A paragraph of text
+    entities = doc_info["ENT_LIST"]  # A List of pairs
+    links = doc_info["NEWS_LINKS"]  # A List of pairs
+    # A List of dictionaries
+    paragraphBreakdown = doc_info["PARAGRAPH_BREAKDOWN"]
+
+    contentClass = [x.get("Category").strip(
+        '/') for x in doc_info["CONTENT_CLASS"] if x.get("Category") is not None]
+
+    if not contentClass:
+        contentClass = ["No Categories Identified"]
+
+    return render_template('report.html', docname=document, content=contentClass, nlpScore=score, mpScore=mpScore,
+                           mpText=mpText, mnScore=mnScore, mnText=mnText, entities=entities, links=links,
+                           pars=paragraphBreakdown)
+
+
+@main.route('/view/<string:document>')
+@login_required
+def view_document(document):
+    document_json = json.dumps({"Name": document})
+    # Retrieves document from the DB
+    doc, code = fu.read_one(current_user.email, document_json)
+    if doc is None or doc == {}:
+        flash('An Error Occurred in retrieving this document')
+        return redirect(url_for('main.profile'))
+
+    text = doc.get('Text').get('Text')  # Extract All paragraphs from text
+    metadata = doc.get("File_Metadata").items()
+
+    return render_template('docView.html', docname=document, text=text, metadata=metadata)
