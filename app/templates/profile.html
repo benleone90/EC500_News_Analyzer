@@ -6,6 +6,14 @@
   {% endif %} {% endwith %}
 <div class="container mx-auto" style="width: 500px">
   <h1 class="display-2 text-center">Welcome, {{ name }}!</h1>
+  <form action="/search" method="POST">
+  <div class="form-group">
+    <label for="searchBox">Search your documents!</label>
+    <input type="text" class="form-control" id="searchBox" name="keywords" aria-describedby="searchHelp" placeholder="keyword 1, keyword2, ...">
+    <small id="searchHelp" class="form-text text-muted">Enter a list of comma separated keywords </small>
+  </div>
+  <button type="submit" class="btn btn-primary">Search</button>
+</form>
   <h1 class="display-5 text-center">Your Documents</h1>
   {% for item in data %}
   <div class="card mb-3">

@@ -5,6 +5,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from docIngester.src import fileuploader as fu
 from reportGenerator import generator as gen
+from docSearch import search as search
 from werkzeug.utils import secure_filename
 import os
 import pathlib
@@ -38,6 +39,19 @@ def profile():
     for element in elements:
         docs.append(element.get("Name"))
     return render_template('profile.html', name=current_user.name, data=docs)
+
+@main.route('/search', methods=['POST'])
+@login_required
+def keySearch():
+    keywords = request.form.get('keywords')  # Get keywords from form
+    if keywords is None or keywords == '':
+        flash('Please enter search terms as a list of comma separated keywords')
+        return redirect(url_for('main.profile'))
+    keywords = keywords.split(',')  # Split keywords by comma separator
+    results = search.runSearch(current_user.email, keywords)  # Retrieve results from entity analysis
+    keystring = ', '.join([str(kword) for kword in keywords])  # Generate keyword string for display
+    return render_template('searchResults.html', keywords=keystring, results=results)
+
 
 
 @main.route('/upload')

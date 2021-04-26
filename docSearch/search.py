@@ -26,7 +26,7 @@ def searchHelper(doc, keywords, finishQ):
         finishQ.put(ret)  # Otherwise add the item to the Queue
 
 
-def search(username, *args):
+def runSearch(username, args):
     ret = []  # initialize return list
 
     if args is None or args == '':
