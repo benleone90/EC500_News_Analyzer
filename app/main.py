@@ -135,4 +135,17 @@ def view_document(document):
     text = doc.get('Text').get('Text')  # Extract All paragraphs from text
     metadata = doc.get("File_Metadata").items()
 
-    return render_template('docView.html', docname=document, text=text, metadata=metadata)
+    return render_template('docView.html', docName=document, text=text, metadata=metadata)
+
+@main.route('/delete/<string:document>')
+@login_required
+def delete(document):
+    document_json = json.dumps({"Name": document})
+    # Retrieves document from the DB
+    msg, code = fu.delete(current_user.email, document_json)
+    if code == 404:
+        flash(f'Unable to Delete {document}')
+    else:
+        flash(f'The document {document} has been successfully deleted')
+
+    return redirect(url_for('main.profile'))
