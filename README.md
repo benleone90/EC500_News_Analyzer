@@ -22,7 +22,7 @@ Before setup, ensure that you have API keys for Google's NLP, the New York Times
 
 ## Demo Video
 
-[Video Link](#)
+[Video Link](https://github.com/benleone90/EC500_News_Analyzer/blob/main/video/demo.mp4)
 
 ## Enhancements/New Features Implemented
 
